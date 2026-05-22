@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH --job-name=CorrDiff
+#SBATCH --partition=ind-gpu-shared
+#SBATCH --account=cwp134
+#SBATCH --nodes=1
+#SBATCH --gpus=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=90G
+#SBATCH -t 48:00:00
+#SBATCH --output=job_logs/job_%j.out
+#SBATCH --error=job_logs/job_%j.err
+#SBATCH --no-requeue
+
+# A GPU SU is equivalent to 1GPU, <10CPUs, and <92G of memory.
+# So this job requests the maximum resources that is charged as one SU.
+
+set -e
+
+# Read in command line arguments
+LEAD_TIME=$1
+
+# Activate your conda environment
+source /home/weiming/.bashrc
+conda activate venv_torch
+
+# Run your Python script with arguments
+cd /home/weiming/github/2025_Diffusion
+python -u Project_EarthData_main.py \
+    --lead_time "$LEAD_TIME" \
+    --val_period 2022-10-01_2023-09-30 \
+    --test_period 2023-10-01_2024-09-30
+
